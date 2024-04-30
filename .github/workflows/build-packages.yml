@@ -1,0 +1,193 @@
+name: OROS Packages Build
+run-name: OROS Packages Build
+on:
+  push:
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: vyos/vyos-build:${{ github.ref_name }}
+      options: --privileged --sysctl net.ipv6.conf.lo.disable_ipv6=0
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - run: |
+          git config --global --add safe.directory '*'
+          apt-get install -y asciidoc-base dh-apparmor dh-exec libcap-dev
+          
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            aws-gateway-load-balancer-tunnel-handler:
+              - '.github/packages/aws-gateway-load-balancer-tunnel-handler.sh'
+              - 'packages/aws-gateway-load-balancer-tunnel-handler/**'
+            ddclient:
+              - .github/packages/ddclient.sh
+              - 'packages/ddclient/**'
+            dropbear:
+              - .github/packages/dropbear.sh
+              - 'packages/dropbear/**'
+            ethtool:
+              - .github/packages/ethtool.sh
+              - 'packages/ethtool/**'
+            frr:
+              - .github/packages/frr.sh
+              - 'packages/frr/**'
+            hostap:
+              - .github/packages/hostap.sh
+              - 'packages/hostap/**'
+            hsflowd:
+              - .github/packages/hsflowd.sh
+              - 'packages/hsflowd/**'
+            isc-dhcp:
+              - .github/packages/isc-dhcp.sh
+              - 'packages/isc-dhcp/**'
+            keepalived:
+              - .github/packages/keepalived.sh
+              - 'packages/keepalived/**'
+            linux-kernel:
+              - .github/packages/linux-kernel.sh
+              - 'packages/linux-kernel/**'
+            ndppd:
+              - .github/packages/ndppd.sh
+              - 'packages/ndppd/**'
+            netfilter:
+              - .github/packages/netfilter.sh
+              - 'packages/netfilter/**'
+            opennhrp:
+              - .github/packages/opennhrp.sh
+              - 'packages/opennhrp/**'
+            openvpn-otp:
+              - .github/packages/openvpn-otp.sh
+              - 'packages/openvpn-otp/**'
+            owamp:
+              - .github/packages/owamp.sh
+              - 'packages/owamp/**'
+            pam_tacplus:
+              - .github/packages/pam_tacplus.sh
+              - 'packages/pam_tacplus/**'
+            pmacct:
+              - .github/packages/pmacct.sh
+              - 'packages/pmacct/**'
+            pyhumps:
+              - .github/packages/pyhumps.sh
+              - 'packages/pyhumps/**'
+            radvd:
+              - .github/packages/radvd.sh
+              - 'packages/radvd/**'
+            strongswan:
+              - .github/packages/strongswan.sh
+              - 'packages/strongswan/**'
+            telegraf:
+              - 'packages/telegraf/**'
+              - .github/packages/telegraf.sh
+            wide-dhcpv6:
+              - .github/packages/wide-dhcpv6.sh
+              - 'packages/wide-dhcpv6/**'
+              
+      - name: Build aws-gateway-load-balancer-tunnel-handler
+        if: steps.changes.outputs.aws-gateway-load-balancer-tunnel-handler == 'true'
+        run: .github/packages/aws-gateway-load-balancer-tunnel-handler.sh
+
+      - name: Build ddclient
+        if: steps.changes.outputs.ddclient == 'true'
+        run: .github/packages/ddclient.sh
+
+      - name: Build dropbear
+        if: steps.changes.outputs.dropbear == 'true'
+        run: .github/packages/dropbear.sh
+
+      - name: Build ethtool
+        if: steps.changes.outputs.ethtool == 'true'
+        run: .github/packages/ethtool.sh
+
+      - name: Build frr
+        if: steps.changes.outputs.frr == 'true'
+        run: .github/packages/frr.sh
+
+      - name: Build hostap
+        if: steps.changes.outputs.hostap == 'true'
+        run: .github/packages/hostap.sh
+
+      - name: Build hsflowd
+        if: steps.changes.outputs.hsflowd == 'true'
+        run: .github/packages/hsflowd.sh
+
+      - name: Build isc-dhcp
+        if: steps.changes.outputs.isc-dhcp == 'true'
+        run: .github/packages/isc-dhcp.sh
+
+      - name: Build keepalived
+        if: steps.changes.outputs.keepalived == 'true'
+        run: .github/packages/keepalived.sh
+
+      - name: Build linux-kernel
+        if: steps.changes.outputs.linux-kernel == 'true'
+        run: .github/packages/linux-kernel.sh
+
+      - name: Build ndppd
+        if: steps.changes.outputs.ndppd == 'true'
+        run: .github/packages/ndppd.sh
+
+      - name: Build netfilter
+        if: steps.changes.outputs.netfilter == 'true'
+        run: .github/packages/netfilter.sh
+
+      - name: Build opennhrp
+        if: steps.changes.outputs.opennhrp == 'true'
+        run: .github/packages/opennhrp.sh
+
+      - name: Build openvpn-otp
+        if: steps.changes.outputs.openvpn-otp == 'true'
+        run: .github/packages/openvpn-otp.sh
+          
+      - name: Build owamp
+        if: steps.changes.outputs.owamp == 'true'
+        run: .github/packages/owamp.sh
+
+      # Disable pam_tacplus build
+      #- name: Build pam_tacplus
+      #  if: steps.changes.outputs.pam_tacplus == 'true'
+      #  run: .github/packages/pam_tacplus.sh
+
+      - name: Build pmacct
+        if: steps.changes.outputs.pmacct == 'true'
+        run: .github/packages/pmacct.sh
+
+      - name: Build pyhumps
+        if: steps.changes.outputs.pyhumps == 'true'
+        run: .github/packages/pyhumps.sh
+
+      - name: Build radvd
+        if: steps.changes.outputs.radvd == 'true'
+        run: .github/packages/radvd.sh
+
+      - name: Build strongswan
+        if: steps.changes.outputs.strongswan == 'true'
+        run: .github/packages/strongswan.sh
+
+      - name: Build telegraf
+        if: steps.changes.outputs.telegraf == 'true'
+        run: .github/packages/telegraf.sh
+
+      - name: Build wide-dhcpv6
+        if: steps.changes.outputs.wide-dhcpv6 == 'true'
+        run: .github/packages/wide-dhcpv6.sh
+          
+      - name: Commit files to repo
+        run: |
+          git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/Open-Router-Operating-System/oros-repo.git
+          ls packages/*.deb >/dev/null 2>&1 && cp -f packages/*.deb oros-repo/${{ github.ref_name }}
+          cd oros-repo
+          git add *
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          [ -n "$(git status --porcelain)" ] && git commit -m "Update oros-build packages"
+          git push origin
